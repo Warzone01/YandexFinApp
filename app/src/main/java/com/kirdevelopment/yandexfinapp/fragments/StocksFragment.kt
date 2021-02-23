@@ -18,6 +18,7 @@ import com.kirdevelopment.yandexfinapp.model.StockItem
 import com.kirdevelopment.yandexfinapp.model.StockList
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.SocketTimeoutException
 
 private const val BASE_URL = "https://finnhub.io/api/v1/"
 
@@ -51,19 +52,21 @@ class StocksFragment : Fragment() {
 
         val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
         val stocks = service.getStockList()
-
         stocks.enqueue(object : Callback<StockList> {
             override fun onResponse(call: Call<StockList>, response: Response<StockList>) {
+
                 val body = response.body()
                 val stocksList = body?.constituents
                 var size = stocksList?.size
-                var stocksItemsList: MutableList<String> = mutableListOf()
+                val stocksItemsList: MutableList<String> = mutableListOf()
 
-                for (i in stocksList!!){
-                    stocksItemsList.add(i)
-                    stocksRV.adapter = MainAdapter(stocksItemsList)
-                    d(TAG, "ListOf $i")
-                }
+
+                    for (i in stocksList!!) {
+                        stocksItemsList.add(i)
+                        stocksRV.adapter = MainAdapter(stocksItemsList)
+                        d(TAG, "ListOf $i")
+                    }
+
 
                 stocksRV.visibility = View.VISIBLE
                 stocksProgress.visibility = View.GONE
@@ -71,20 +74,11 @@ class StocksFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<StockList>, t: Throwable) {
-                d(TAG, t.toString())
+                d(TAG, "ERRO000000R")
+                getCurrentData()
             }
-
         })
     }
-
-
-//    fun showData(body: List<StockItem>){
-//
-//
-//
-//        stocksRV.adapter = MainAdapter(body)
-//    }
-
     companion object {
         @JvmStatic
         fun newInstance() = StocksFragment()
