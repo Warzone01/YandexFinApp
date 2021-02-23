@@ -1,0 +1,9 @@
+package com.kirdevelopment.yandexfinapp.model
+
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+
+data class StockList (
+    @SerializedName("constituents")
+    var constituents: List<String>
+)
