@@ -11,10 +11,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
+import com.squareup.picasso.Picasso
+import java.lang.Exception
 
 class MainAdapter(private val stockItems: MutableList<String>,
                   private val stockCurrentPrice: MutableList<String>,
-                  private val stocksPreviosPrice: MutableList<String>): RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
+                  private val stocksPreviosPrice: MutableList<String>,
+                  private val stocsName: MutableList<String>,
+                  private val stocksLogo: MutableList<String>):
+        RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
         return StocksViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
@@ -24,6 +29,8 @@ class MainAdapter(private val stockItems: MutableList<String>,
         holder.bindTicker(stockItems[position])
         holder.bindCurrentPrice(stockCurrentPrice[position])
         holder.bindPreviosPrice(stocksPreviosPrice[position])
+        holder.bindStocksName(stocsName[position])
+        holder.bindStockLogo(stocksLogo[position])
 
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
         if (position % 2 == 1){
@@ -38,7 +45,7 @@ class MainAdapter(private val stockItems: MutableList<String>,
     }
 
     class StocksViewHolder(view:View): RecyclerView.ViewHolder(view){
-        private val imageLogo = view.findViewById<ImageView>(R.id.logoImage)
+        private val stockLogo = view.findViewById<ImageView>(R.id.logoImage)
         private val stockTicker = view.findViewById<TextView>(R.id.stockTickerText)
         private val stockCompanyName = view.findViewById<TextView>(R.id.stockCompanyNameText)
         private val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
@@ -59,6 +66,21 @@ class MainAdapter(private val stockItems: MutableList<String>,
             } else {
                 stockPriceChange.setTextColor("#24B25D".toColorInt())
             }
+        }
+        fun bindStocksName(name: String){
+            stockCompanyName.text = name
+        }
+
+        fun bindStockLogo(logo: String){
+            try {
+                Picasso.get()
+                        .load(logo)
+                        .resize(70, 70)
+                        .into(stockLogo)
+            }catch (e:Exception){
+                Picasso.get().load(R.drawable.ic_star).into(stockLogo)
+            }
+
         }
 
 
