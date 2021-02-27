@@ -1,24 +1,30 @@
 package com.kirdevelopment.yandexfinapp.adapters
 
+import android.content.res.Resources
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
-import com.kirdevelopment.yandexfinapp.model.StockItem
-import com.kirdevelopment.yandexfinapp.model.StockList
 
-class MainAdapter(private val stockItems: MutableList<String>): RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
+class MainAdapter(private val stockItems: MutableList<String>,
+                  private val stockCurrentPrice: MutableList<String>,
+                  private val stocksPreviosPrice: MutableList<String>): RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
         return StocksViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: StocksViewHolder, position: Int) {
-        holder.bind(stockItems[position])
+        holder.bindTicker(stockItems[position])
+        holder.bindCurrentPrice(stockCurrentPrice[position])
+        holder.bindPreviosPrice(stocksPreviosPrice[position])
+
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
         if (position % 2 == 1){
             layout.setBackgroundResource(R.drawable.stock_background_white)
@@ -38,9 +44,24 @@ class MainAdapter(private val stockItems: MutableList<String>): RecyclerView.Ada
         private val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
         private val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
 
-        fun bind(stockItem: String){
+        fun bindTicker(stockItem: String){
             stockTicker.text = stockItem
         }
+
+        fun bindCurrentPrice(c: String){
+            stockPrice.text = "$$c"
+        }
+
+        fun bindPreviosPrice(pc: String){
+            stockPriceChange.text = pc
+            if (pc.indexOf('-') >= 0){
+                stockPriceChange.setTextColor("#B22424".toColorInt())
+            } else {
+                stockPriceChange.setTextColor("#24B25D".toColorInt())
+            }
+        }
+
+
     }
 
 }

@@ -81,9 +81,9 @@
             android:id="@+id/stockPriceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10000,1 Р"
             android:layout_gravity="center_vertical"
             android:textSize="20sp"
+            android:gravity="end"
             android:textColor="@color/black"
             android:textStyle="bold"/>
 
@@ -91,7 +91,7 @@
             android:id="@+id/stockPriceChangeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+1р(0,00015%)"
+            android:layout_gravity="end"
             android:textColor="@color/stock_price_v1_color"
             android:textSize="15sp"/>
 

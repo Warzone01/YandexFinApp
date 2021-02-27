@@ -6,27 +6,42 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.gson.Gson
 import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
-import com.kirdevelopment.yandexfinapp.model.StockItem
 import com.kirdevelopment.yandexfinapp.model.StockList
+import com.kirdevelopment.yandexfinapp.model.StockPrice
+import com.kirdevelopment.yandexfinapp.model.StockProfile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
-import java.net.SocketTimeoutException
+import java.lang.Exception
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 private const val BASE_URL = "https://finnhub.io/api/v1/"
+private const val TOKEN = "c0nk5uv48v6temfsrpdg"
 
 class StocksFragment : Fragment() {
 
     private lateinit var stocksRV: RecyclerView
     private lateinit var stocksProgress: CircularProgressIndicator
     private var TAG = "StocksFragment"
+
+    val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
+
+    val stocksItemsList: MutableList<String> = mutableListOf()
+    val stocksCurrentPrice: MutableList<String> = mutableListOf()
+    val stocksPreviousPrice: MutableList<String> = mutableListOf()
+    val stockNameList: MutableList<String> = mutableListOf()
+    val stockLogoList: MutableList<String> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,41 +59,74 @@ class StocksFragment : Fragment() {
         stocksRV.visibility = View.GONE
 
         getCurrentData()
-
         return view
     }
 
     private fun getCurrentData(){
 
-        val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
-        val stocks = service.getStockList()
-        stocks.enqueue(object : Callback<StockList> {
-            override fun onResponse(call: Call<StockList>, response: Response<StockList>) {
-
-                val body = response.body()
-                val stocksList = body?.constituents
-                var size = stocksList?.size
-                val stocksItemsList: MutableList<String> = mutableListOf()
-
-
-                    for (i in stocksList!!) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val stockList = service.getStockList(TOKEN).awaitResponse()
+            try {
+                if (stockList.isSuccessful) {
+                    val bodyTicker = stockList.body()
+                    val stocksListItem = bodyTicker?.constituents
+                    for (i in stocksListItem!!) {
                         stocksItemsList.add(i)
-                        stocksRV.adapter = MainAdapter(stocksItemsList)
-                        d(TAG, "ListOf $i")
+                        d(TAG, "Тикер $i")
+
+                        //Get and show all stocks prices
+                        val priceList = service.getStockPrice(i, TOKEN).awaitResponse()
+                        try {
+                            if (priceList.isSuccessful) {
+                                val bodyPrice = priceList.body()
+                                val priceCurrentItem = bodyPrice?.stockCurrentPrice
+                                val pricePreviosItem = bodyPrice?.stockPreviousClosePrice
+                                val df = DecimalFormat("#.##")
+                                df.roundingMode = RoundingMode.FLOOR
+                                val plusPrice = priceCurrentItem!! - pricePreviosItem!!
+                                val minusPrice = pricePreviosItem - priceCurrentItem
+                                val resOfPrices = if (priceCurrentItem > pricePreviosItem) "+$${df.format(plusPrice)}" else "-$${df.format(minusPrice)}"
+                                stocksCurrentPrice.add(df.format(priceCurrentItem!!).toString())
+                                stocksPreviousPrice.add(resOfPrices)
+
+                                d(TAG, priceCurrentItem!!.toString())
+                            }
+                        }catch (e: Exception){
+
+                        }
+
+
+                        val profileList = service.getStockProfile(i, TOKEN).awaitResponse()
+                        try {
+                            if (profileList.isSuccessful){
+                                val profileBody = profileList.body()
+                                val profileName = profileBody?.name.toString()
+                                val profileLogo = profileBody?.logo.toString()
+                                stockNameList.add(profileName)
+
+                                d(TAG, profileLogo)
+                                d(TAG, profileName)
+                            }
+                        }catch (e:Exception){
+                            println("ЕГОР")
+                        }
+
                     }
-
-
-                stocksRV.visibility = View.VISIBLE
-                stocksProgress.visibility = View.GONE
-
+                    withContext(Dispatchers.Main) {
+                        stocksRV.adapter = MainAdapter(stocksItemsList, stocksCurrentPrice, stocksPreviousPrice)
+                        stocksRV.visibility = View.VISIBLE
+                        stocksProgress.visibility = View.GONE
+                    }
+                }
+            }catch (e: Exception){
+                d("Error", e.toString())
             }
 
-            override fun onFailure(call: Call<StockList>, t: Throwable) {
-                d(TAG, "ERRO000000R")
-                getCurrentData()
-            }
-        })
+        }
     }
+
+
+
     companion object {
         @JvmStatic
         fun newInstance() = StocksFragment()
