@@ -5,7 +5,6 @@ import com.kirdevelopment.yandexfinapp.model.StockPrice
 import com.kirdevelopment.yandexfinapp.model.StockProfile
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface StockApi {

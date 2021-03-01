@@ -1,7 +1,5 @@
 package com.kirdevelopment.yandexfinapp.adapters
 
-import android.content.res.Resources
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +14,8 @@ import java.lang.Exception
 
 class MainAdapter(private val stockItems: MutableList<String>,
                   private val stockCurrentPrice: MutableList<String>,
-                  private val stocksPreviosPrice: MutableList<String>,
-                  private val stocsName: MutableList<String>,
+                  private val stocksPreviousPrice: MutableList<String>,
+                  private val stocksName: MutableList<String>,
                   private val stocksLogo: MutableList<String>):
         RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
 
@@ -28,8 +26,8 @@ class MainAdapter(private val stockItems: MutableList<String>,
     override fun onBindViewHolder(holder: StocksViewHolder, position: Int) {
         holder.bindTicker(stockItems[position])
         holder.bindCurrentPrice(stockCurrentPrice[position])
-        holder.bindPreviosPrice(stocksPreviosPrice[position])
-        holder.bindStocksName(stocsName[position])
+        holder.bindPreviousPrice(stocksPreviousPrice[position])
+        holder.bindStocksName(stocksName[position])
         holder.bindStockLogo(stocksLogo[position])
 
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
@@ -59,7 +57,7 @@ class MainAdapter(private val stockItems: MutableList<String>,
             stockPrice.text = "$$c"
         }
 
-        fun bindPreviosPrice(pc: String){
+        fun bindPreviousPrice(pc: String){
             stockPriceChange.text = pc
             if (pc.indexOf('-') >= 0){
                 stockPriceChange.setTextColor("#B22424".toColorInt())
@@ -79,10 +77,6 @@ class MainAdapter(private val stockItems: MutableList<String>,
             }catch (e:Exception){
 
             }
-
         }
-
-
     }
-
 }

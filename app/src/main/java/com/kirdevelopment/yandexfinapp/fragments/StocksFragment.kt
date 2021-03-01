@@ -9,14 +9,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.google.gson.Gson
 import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
-//import com.kirdevelopment.yandexfinapp.model.StockList
-import com.kirdevelopment.yandexfinapp.model.StockPrice
-import com.kirdevelopment.yandexfinapp.model.StockProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -66,7 +62,6 @@ class StocksFragment : Fragment() {
 
     private fun getCurrentData(){
 
-
         stocksItemsList.sort()
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -91,7 +86,7 @@ class StocksFragment : Fragment() {
                             d(TAG, priceCurrentItem!!.toString())
                         }
                     } catch (e: Exception) {
-
+                        d(TAG, "Error: $e")
                     }
 
                     //add profile name and image
@@ -108,18 +103,19 @@ class StocksFragment : Fragment() {
                             d(TAG, profileName)
                         }
                     } catch (e: Exception) {
-                        println("ЕГОР")
+                        d(TAG, "Error: $e")
                     }
                 }
                     withContext(Dispatchers.Main) {
                         stocksRV.adapter = MainAdapter(stocksItemsList, stocksCurrentPrice, stocksPreviousPrice, stockNameList, stockLogoList)
+                        stocksRV.setHasFixedSize(true)
+                        stocksRV.setItemViewCacheSize(30)
                         stocksRV.visibility = View.VISIBLE
                         stocksProgress.visibility = View.GONE
                     }
             }catch (e: Exception){
                 d("Error", e.toString())
             }
-
         }
     }
 
