@@ -75,10 +75,9 @@ class MainAdapter(private val stockItems: MutableList<String>,
             try {
                 Picasso.get()
                         .load(logo)
-                        .resize(70, 70)
                         .into(stockLogo)
             }catch (e:Exception){
-                Picasso.get().load(R.drawable.ic_star).into(stockLogo)
+
             }
 
         }

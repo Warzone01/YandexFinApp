@@ -66,16 +66,11 @@ class StocksFragment : Fragment() {
 
     private fun getCurrentData(){
 
+
+        stocksItemsList.sort()
+
         GlobalScope.launch(Dispatchers.IO) {
-//            val stockList = service.getStockList(TOKEN).awaitResponse()
             try {
-//                if (stockList.isSuccessful) {
-//                    val bodyTicker = stockList.body()
-//                    val stocksListItem = bodyTicker?.constituents
-//                    for (i in stocksListItem!!) {
-//                        stocksItemsList.add(i)
-//                        d(TAG, "Тикер $i")
-//                    }
 
                 for (i in stocksItemsList){
                 //Get and show all stocks prices
