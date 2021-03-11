@@ -1,11 +1,13 @@
 package com.kirdevelopment.yandexfinapp.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
@@ -30,7 +32,21 @@ class MainAdapter(private val stockItems: MutableList<String>,
         holder.bindStocksName(stocksName[position])
         holder.bindStockLogo(stocksLogo[position])
 
+        //change background color for items
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
+        val star = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
+        var isActive: Boolean = false
+
+        star.setOnClickListener {
+            isActive = if (isActive){
+                star.setImageResource(R.drawable.ic_star)
+                false
+            } else{
+                star.setImageResource(R.drawable.ic_star_active)
+                true
+            }
+        }
+
         if (position % 2 == 1){
             layout.setBackgroundResource(R.drawable.stock_background_white)
         }else{
@@ -43,12 +59,14 @@ class MainAdapter(private val stockItems: MutableList<String>,
     }
 
     class StocksViewHolder(view:View): RecyclerView.ViewHolder(view){
+        //find views
         private val stockLogo = view.findViewById<ImageView>(R.id.logoImage)
         private val stockTicker = view.findViewById<TextView>(R.id.stockTickerText)
         private val stockCompanyName = view.findViewById<TextView>(R.id.stockCompanyNameText)
         private val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
         private val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
 
+        //all binds
         fun bindTicker(stockItem: String){
             stockTicker.text = stockItem
         }
@@ -59,6 +77,7 @@ class MainAdapter(private val stockItems: MutableList<String>,
 
         fun bindPreviousPrice(pc: String){
             stockPriceChange.text = pc
+            //change price text color if "-"
             if (pc.indexOf('-') >= 0){
                 stockPriceChange.setTextColor("#B22424".toColorInt())
             } else {

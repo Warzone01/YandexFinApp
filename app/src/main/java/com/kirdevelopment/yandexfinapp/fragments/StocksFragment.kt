@@ -31,15 +31,17 @@ class StocksFragment : Fragment() {
     private lateinit var stocksProgress: CircularProgressIndicator
     private var TAG = "StocksFragment"
 
+    //creating retrofit
     val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
 
-    val stocksItemsList: MutableList<String> = mutableListOf("IBM","VZ","AAPL","CRM","JNJ","AMGN","CAT","JPM","INTC","UNH","NKE","CSCO","WBA","AXP","PG","DOW","MMM","HON","WMT","BA","KO","MCD","MSFT","CVX","GS","V","MRK","DIS","TRV","HD")
+    //all lists for stock items
+    val stocksItemsList: MutableList<String> = mutableListOf("IBM","VZ","AAPL","CRM","JNJ","AMGN",
+            "CAT","JPM","INTC","UNH","NKE","CSCO","WBA","AXP","PG","DOW","MMM","HON","WMT","BA",
+            "KO","MCD","MSFT","CVX","GS","V","MRK","DIS","TRV","HD")
     val stocksCurrentPrice: MutableList<String> = mutableListOf()
     val stocksPreviousPrice: MutableList<String> = mutableListOf()
     val stockNameList: MutableList<String> = mutableListOf()
     val stockLogoList: MutableList<String> = mutableListOf()
-
-    val resLIst = stocksItemsList - 5
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,6 +55,7 @@ class StocksFragment : Fragment() {
         stocksRV.layoutManager = LinearLayoutManager(view.context)
         stocksRV.setHasFixedSize(true)
 
+        //show progress circle and hide adapter
         stocksProgress.visibility = View.VISIBLE
         stocksRV.visibility = View.GONE
 
@@ -61,9 +64,10 @@ class StocksFragment : Fragment() {
     }
 
     private fun getCurrentData(){
-
+        //sorting stocks for alphabet
         stocksItemsList.sort()
 
+        //starting coroutine for add items from api
         GlobalScope.launch(Dispatchers.IO) {
             try {
 
@@ -73,14 +77,20 @@ class StocksFragment : Fragment() {
                     try {
                         if (priceList.isSuccessful) {
                             val bodyPrice = priceList.body()
+                            //get current price
                             val priceCurrentItem = bodyPrice?.stockCurrentPrice
-                            val pricePreviosItem = bodyPrice?.stockPreviousClosePrice
+                            //get previous price
+                            val pricePreviousItem = bodyPrice?.stockPreviousClosePrice
+                            //pattern for price
                             val df = DecimalFormat("#.##")
                             df.roundingMode = RoundingMode.FLOOR
-                            val plusPrice = priceCurrentItem!! - pricePreviosItem!!
-                            val minusPrice = pricePreviosItem - priceCurrentItem
-                            val resOfPrices = if (priceCurrentItem > pricePreviosItem) "+$${df.format(plusPrice)}" else "-$${df.format(minusPrice)}"
+                            //add operator for previous price
+                            val plusPrice = priceCurrentItem!! - pricePreviousItem!!
+                            val minusPrice = pricePreviousItem - priceCurrentItem
+                            val resOfPrices = if (priceCurrentItem > pricePreviousItem) "+$${df.format(plusPrice)}" else "-$${df.format(minusPrice)}"
+                            //add current price in list
                             stocksCurrentPrice.add(df.format(priceCurrentItem!!).toString())
+                            //add previous price in list
                             stocksPreviousPrice.add(resOfPrices)
 
                             d(TAG, priceCurrentItem!!.toString())
@@ -94,9 +104,13 @@ class StocksFragment : Fragment() {
                     try {
                         if (profileList.isSuccessful) {
                             val profileBody = profileList.body()
+                            //get profile name
                             val profileName = profileBody?.name.toString()
+                            //get profile logo image
                             val profileLogo = profileBody?.logo.toString()
+                            //add profileName in list
                             stockNameList.add(profileName)
+                            //add profile logo image in list
                             stockLogoList.add((profileLogo))
 
                             d(TAG, profileLogo)
@@ -106,15 +120,19 @@ class StocksFragment : Fragment() {
                         d(TAG, "Error: $e")
                     }
                 }
+
+                    //add adapter and adding item in adapter
                     withContext(Dispatchers.Main) {
                         stocksRV.adapter = MainAdapter(stocksItemsList, stocksCurrentPrice, stocksPreviousPrice, stockNameList, stockLogoList)
+                        //add image for cache
                         stocksRV.setHasFixedSize(true)
                         stocksRV.setItemViewCacheSize(30)
+                        //hide progress circle and show adapter
                         stocksRV.visibility = View.VISIBLE
                         stocksProgress.visibility = View.GONE
                     }
             }catch (e: Exception){
-                d("Error", e.toString())
+                getCurrentData()
             }
         }
     }

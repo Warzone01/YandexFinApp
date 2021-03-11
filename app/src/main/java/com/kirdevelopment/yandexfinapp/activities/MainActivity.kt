@@ -19,9 +19,7 @@ class MainActivity : MvpAppCompatActivity(), MainView {
     private lateinit var mainTabsViewPager: ViewPager2
     private lateinit var mainStocksTabText: TextView
     private lateinit var mainFavouriteTabText: TextView
-    private lateinit var stocksRV: RecyclerView
 
-    private lateinit var stocksAdapter: MainAdapter
     @InjectPresenter
     lateinit var mainPresenter: MainActivityPresenter
 
@@ -37,24 +35,16 @@ class MainActivity : MvpAppCompatActivity(), MainView {
 
     }
 
-    override fun onStartLoading() {
-
-    }
-
-    override fun onEndLoading() {
-
-    }
-
-    override fun onError(string: String) {
-
-    }
-
+    //add stocks and favourite tabs to main activity
     override fun initTabs() {
+        //add adapter for view pager
         mainTabsViewPager.adapter = TabsViewPagerAdapter(supportFragmentManager, lifecycle)
         mainTabsViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                //change color and text size when focused
                 when (position) {
+                    //when stocks tab in focus
                     0 -> {
                         mainStocksTabText.setTextColor(Color.BLACK)
                         mainStocksTabText.textSize = 30f
@@ -62,6 +52,7 @@ class MainActivity : MvpAppCompatActivity(), MainView {
                         mainFavouriteTabText.setTextColor(Color.GRAY)
                         mainFavouriteTabText.textSize = 20f
                     }
+                    //when favourite tab in focus
                     else ->{
                         mainFavouriteTabText.setTextColor(Color.BLACK)
                         mainFavouriteTabText.textSize = 30f
@@ -72,16 +63,14 @@ class MainActivity : MvpAppCompatActivity(), MainView {
                 }
             }
         })
+
+        //change to stocks tab on click
         mainStocksTabText.setOnClickListener {
             mainTabsViewPager.currentItem = 0
         }
+        //change to favourite tab on click
         mainFavouriteTabText.setOnClickListener {
             mainTabsViewPager.currentItem = 1
         }
     }
-
-    fun createRecycler(v: View){
-
-    }
-
 }
