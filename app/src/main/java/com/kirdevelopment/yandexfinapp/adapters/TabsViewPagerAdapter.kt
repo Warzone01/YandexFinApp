@@ -6,6 +6,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.kirdevelopment.yandexfinapp.fragments.FavouriteFragment
 import com.kirdevelopment.yandexfinapp.fragments.StocksFragment
+import moxy.MvpAppCompatFragment
+import moxy.MvpFragment
 
 class TabsViewPagerAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
@@ -13,7 +15,7 @@ class TabsViewPagerAdapter(fm: FragmentManager, lifecycle: Lifecycle) : Fragment
         return 2
     }
 
-    override fun createFragment(position: Int): Fragment{
+    override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
                 StocksFragment()
