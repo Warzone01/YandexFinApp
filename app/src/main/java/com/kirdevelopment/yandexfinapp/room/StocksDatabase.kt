@@ -9,13 +9,14 @@ import androidx.room.RoomDatabase
 abstract class StocksDatabase: RoomDatabase() {
     abstract fun stocksDao(): StocksDao
     companion object {
-        private var stocksDatabase: StocksDatabase? = null
+        var stocksDatabase: StocksDatabase? = null
         fun getDatabase(context: Context):StocksDatabase {
             if (stocksDatabase == null){
                 stocksDatabase = Room.databaseBuilder(
                         context,
                         StocksDatabase::class.java,
-                        "stocksDB").build()
+                        "stocksDB")
+                    .build()
             }
             return stocksDatabase as StocksDatabase
         }

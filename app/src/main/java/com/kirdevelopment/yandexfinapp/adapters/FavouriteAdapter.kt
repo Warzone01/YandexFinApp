@@ -13,19 +13,16 @@ import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.squareup.picasso.Picasso
 import java.lang.Exception
 
-class MainAdapter(private val stockItems: List<StocksEntity>):
-        RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
+class FavouriteAdapter(private val favouriteItems: List<StocksEntity>): RecyclerView.Adapter<FavouriteAdapter.FavouriteViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
-        return StocksViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouriteViewHolder {
+        return FavouriteViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
     }
 
-    override fun onBindViewHolder(holder: StocksViewHolder, position: Int) {
-        holder.bindStock(stockItems[position])
-
+    override fun onBindViewHolder(holder: FavouriteViewHolder, position: Int) {
+        holder.bindFavourite(favouriteItems[position])
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
 
-        //change background color for items
         if (position % 2 == 1){
             layout.setBackgroundResource(R.drawable.stock_background_white)
         }else{
@@ -34,10 +31,10 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
     }
 
     override fun getItemCount(): Int {
-        return stockItems.size
+        return favouriteItems.size
     }
 
-    class StocksViewHolder(view:View): RecyclerView.ViewHolder(view){
+    class FavouriteViewHolder(view: View): RecyclerView.ViewHolder(view){
         //find views
         private val stockLogo = view.findViewById<ImageView>(R.id.logoImage)
         private val stockTicker = view.findViewById<TextView>(R.id.stockTickerText)
@@ -46,7 +43,7 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         private val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
 
         //all binds
-        fun bindStock(stockItem: StocksEntity){
+        fun bindFavourite(stockItem: StocksEntity){
             stockTicker.text = stockItem.ticker
             stockCompanyName.text = stockItem.name
             stockPrice.text = "$${stockItem.currentPrice}"
@@ -56,7 +53,7 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
                 Picasso.get()
                         .load(stockItem.logo)
                         .into(stockLogo)
-            }catch (e:Exception){
+            }catch (e: Exception){
 
             }
 
@@ -68,4 +65,5 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
 
         }
     }
+
 }

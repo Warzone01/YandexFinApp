@@ -7,7 +7,7 @@ interface StocksDao {
     @Query("SELECT * FROM stocks ORDER BY id DESC")
     fun getAllStocks():List<StocksEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     fun insertStocks(stocks: StocksEntity)
 
     @Update

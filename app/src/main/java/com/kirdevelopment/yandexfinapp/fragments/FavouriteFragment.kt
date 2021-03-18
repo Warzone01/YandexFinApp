@@ -3,19 +3,41 @@ package com.kirdevelopment.yandexfinapp.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
+import com.kirdevelopment.yandexfinapp.presenters.FavouriteFragmentPresenter
+import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import moxy.MvpFragment
 
 class FavouriteFragment : Fragment() {
+
+    private lateinit var favouriteRV: RecyclerView
+    private lateinit var textEmpty: TextView
+
+    lateinit var favouriteFragmentPresenter: FavouriteFragmentPresenter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourite, container, false)
+        val view = inflater.inflate(R.layout.fragment_favourite, container, false)
+
+        favouriteFragmentPresenter = FavouriteFragmentPresenter()
+
+        favouriteRV = view.findViewById(R.id.favouritesRV)
+        favouriteRV.layoutManager = LinearLayoutManager(view.context)
+
+        textEmpty = view.findViewById(R.id.textEmpty)
+
+        favouriteFragmentPresenter.getCurrentData(view.context, favouriteRV, textEmpty)
+
+        return view
     }
 
     companion object {

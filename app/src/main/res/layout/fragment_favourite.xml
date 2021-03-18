@@ -7,9 +7,19 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/textEmpty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="30sp"
-        android:text="Favourite" />
+        android:textSize="20sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/no_favourite_stocks" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favouritesRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
 </FrameLayout>

@@ -47,9 +47,8 @@ class StocksFragment : Fragment() {
         stocksProgress = view.findViewById(R.id.stocksProgress)
 
         stocksRV.layoutManager = LinearLayoutManager(view.context)
-        stocksRV.setHasFixedSize(true)
 
-        stocksPresenter.getCurrentData(stocksRV, stocksProgress)
+        stocksPresenter.getCurrentData(stocksRV, stocksProgress, view.context)
 
         return view
     }

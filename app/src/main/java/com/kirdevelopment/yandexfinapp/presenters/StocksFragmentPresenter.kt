@@ -1,12 +1,16 @@
 package com.kirdevelopment.yandexfinapp.presenters
 
+import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.kirdevelopment.yandexfinapp.adapters.FavouriteAdapter
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
+import com.kirdevelopment.yandexfinapp.room.StocksDatabase
+import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.kirdevelopment.yandexfinapp.views.StocksView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -26,28 +30,38 @@ private const val TOKEN = "c0nk5uv48v6temfsrpdg"
 class StocksFragmentPresenter{
 
     private var TAG = "StocksFragment"
+    private lateinit var database: StocksDatabase
+
+    private var isFavourite = false
 
     //creating retrofit
-    val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
+    private val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
 
     //all lists for stock items
-    val stocksItemsList: MutableList<String> = mutableListOf("IBM","VZ","AAPL","CRM","JNJ","AMGN",
+    private val stocksItemsList: MutableList<String> = mutableListOf("IBM","VZ","AAPL","CRM","JNJ","AMGN",
             "CAT","JPM","INTC","UNH","NKE","CSCO","WBA","AXP","PG","DOW","MMM","HON","WMT","BA",
             "KO","MCD","MSFT","CVX","GS","V","MRK","DIS","TRV","HD")
-    val stocksCurrentPrice: MutableList<String> = mutableListOf()
-    val stocksPreviousPrice: MutableList<String> = mutableListOf()
-    val stockNameList: MutableList<String> = mutableListOf()
-    val stockLogoList: MutableList<String> = mutableListOf()
 
-    fun getCurrentData(stocksRV: RecyclerView, cv: CircularProgressIndicator){
+    private var stocksList: ArrayList<StocksEntity> = ArrayList()
+
+    var stocksCurrentPrice1: String = ""
+    var stocksPreviousPrice1: String = ""
+    var stocksName: String = ""
+    var stocksLogo: String = ""
+
+    fun getCurrentData(stocksRV: RecyclerView, cv: CircularProgressIndicator, context: Context){
         //sorting stocks for alphabet
         stocksItemsList.sort()
         //show load progress and hide stocks list
         showLoad(stocksRV, cv)
+
+        database = StocksDatabase.getDatabase(context)
+
         //starting coroutine for add items from api
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                for (i in stocksItemsList){
+                val listStocks = StocksDatabase.getDatabase(context).stocksDao().getAllStocks()
+                for (i in stocksItemsList) {
                     //Get and show all stocks prices
                     val priceList = service.getStockPrice(i, TOKEN).awaitResponse()
                     try {
@@ -64,12 +78,11 @@ class StocksFragmentPresenter{
                             val plusPrice = priceCurrentItem!! - pricePreviousItem!!
                             val minusPrice = pricePreviousItem - priceCurrentItem
                             val resOfPrices = if (priceCurrentItem > pricePreviousItem) "+$${df.format(plusPrice)}" else "-$${df.format(minusPrice)}"
-                            //add current price in list
-                            stocksCurrentPrice.add(df.format(priceCurrentItem!!).toString())
-                            //add previous price in list
-                            stocksPreviousPrice.add(resOfPrices)
 
-                            Log.d(TAG, priceCurrentItem!!.toString())
+                            stocksCurrentPrice1 = df.format(priceCurrentItem).toString()
+                            stocksPreviousPrice1 = resOfPrices
+
+
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "Error: $e")
@@ -84,44 +97,64 @@ class StocksFragmentPresenter{
                             val profileName = profileBody?.name.toString()
                             //get profile logo image
                             val profileLogo = profileBody?.logo.toString()
-                            //add profileName in list
-                            stockNameList.add(profileName)
-                            //add profile logo image in list
-                            stockLogoList.add((profileLogo))
 
-                            Log.d(TAG, profileLogo)
-                            Log.d(TAG, profileName)
+                            stocksName = profileName
+                            stocksLogo = profileLogo
+
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "Error: $e")
                     }
+
+                    Log.d(TAG, i)
+                    Log.d(TAG, stocksName)
+                    Log.d(TAG, stocksLogo)
+                    Log.d(TAG, stocksCurrentPrice1)
+                    if(listStocks.size != stocksItemsList.size) {
+                        saveToDb(stocksName, i, stocksLogo, stocksCurrentPrice1, stocksPreviousPrice1, isFavourite)
+                    }
+
                 }
 
                 //add adapter and adding item in adapter
                 withContext(Dispatchers.Main) {
                     //hide load progress and show stocks list
                     hideLoad(stocksRV, cv)
-                    stocksRV.adapter = MainAdapter(stocksItemsList, stocksCurrentPrice, stocksPreviousPrice, stockNameList, stockLogoList)
-                    //add image cache
-                    stocksRV.setHasFixedSize(true)
-                    stocksRV.setItemViewCacheSize(30)
-
+                    stocksList.addAll(listStocks)
+                    stocksRV.adapter = MainAdapter(stocksList)
                 }
             }catch (e: Exception){
-
+                println(e.toString())
             }
         }
     }
 
-    fun showLoad(rv: RecyclerView, cv: CircularProgressIndicator){
+    private fun showLoad(rv: RecyclerView, cv: CircularProgressIndicator){
         rv.visibility = View.GONE
         cv.visibility = View.VISIBLE
     }
 
-    fun hideLoad(rv: RecyclerView, cv: CircularProgressIndicator){
+    private fun hideLoad(rv: RecyclerView, cv: CircularProgressIndicator){
         rv.visibility = View.VISIBLE
         cv.visibility = View.GONE
     }
 
+    private fun saveToDb(name: String,
+                         ticker:String,
+                         logo: String,
+                         currentPrice: String,
+                         previousPrice: String,
+                         isFavourite: Boolean){
 
+        val stock = StocksEntity()
+        stock.name = name
+        stock.ticker = ticker
+        stock.currentPrice = currentPrice
+        stock.previousPrice = previousPrice
+        stock.logo = logo
+        stock.isFavourite = isFavourite
+
+        database.stocksDao().insertStocks(stock)
+
+    }
 }

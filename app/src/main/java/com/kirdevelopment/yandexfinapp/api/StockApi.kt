@@ -1,3 +1,4 @@
+
 package com.kirdevelopment.yandexfinapp.api
 
 //import com.kirdevelopment.yandexfinapp.model.StockList

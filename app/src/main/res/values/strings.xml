@@ -5,4 +5,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="stocks_text">Stocks</string>
     <string name="favourite_text">Favourite</string>
+    <string name="no_favourite_stocks">You don\'t have favourite stocks!</string>
 </resources>

@@ -1,18 +1,27 @@
 package com.kirdevelopment.yandexfinapp.room
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "stocks")
 data class StocksEntity(
-        @PrimaryKey(autoGenerate = true)
-        val id: Int? = null,
-        val ticker: String,
-        val name: String,
-        val logo: String,
-        val currentPrice: String,
-        val previousPrice: String,
-        val isFavourite: Boolean )
+        @PrimaryKey(autoGenerate = true) var id: Int? = null,
+        @ColumnInfo(name = "ticker")var ticker: String,
+        @ColumnInfo(name = "name")var name: String,
+        @ColumnInfo(name = "logo")var logo: String,
+        @ColumnInfo(name = "current_price")var currentPrice: String,
+        @ColumnInfo(name = "previous_price")var previousPrice: String,
+        @ColumnInfo(name = "is_favourite")var isFavourite: Boolean ): Serializable{
+constructor():this(null,
+        "",
+        "",
+        "",
+        "",
+        "",
+        false)
+}
 
 
 
