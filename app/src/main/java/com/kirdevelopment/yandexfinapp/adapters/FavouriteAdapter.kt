@@ -46,7 +46,7 @@ class FavouriteAdapter(private val favouriteItems: List<StocksEntity>): Recycler
         fun bindFavourite(stockItem: StocksEntity){
             stockTicker.text = stockItem.ticker
             stockCompanyName.text = stockItem.name
-            stockPrice.text = "$${stockItem.currentPrice}"
+            stockPrice.text = "${stockItem.currentPrice}"
             stockPriceChange.text = stockItem.previousPrice
 
             try {

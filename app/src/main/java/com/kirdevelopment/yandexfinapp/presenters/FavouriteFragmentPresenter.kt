@@ -23,7 +23,7 @@ class FavouriteFragmentPresenter {
         stocksDatabase = StocksDatabase.getDatabase(context)
 
         GlobalScope.launch(Dispatchers.IO) {
-            val favouriteStocksList = StocksDatabase.getDatabase(context).stocksDao().getAllStocks()
+            val favouriteStocksList = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
 
             withContext(Dispatchers.Main) {
                 favouriteList.addAll(favouriteStocksList)

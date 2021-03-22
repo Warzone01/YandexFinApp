@@ -9,12 +9,19 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
+import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class MainAdapter(private val stockItems: List<StocksEntity>):
         RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
+
+    private val stocksFragmentPresenter = StocksFragmentPresenter()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
         return StocksViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
@@ -24,6 +31,11 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         holder.bindStock(stockItems[position])
 
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
+        val favouriteBtn = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
+
+        favouriteBtn.setOnClickListener {
+            stocksFragmentPresenter.addToFavourite(holder.itemView.context)
+        }
 
         //change background color for items
         if (position % 2 == 1){
@@ -39,11 +51,11 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
 
     class StocksViewHolder(view:View): RecyclerView.ViewHolder(view){
         //find views
-        private val stockLogo = view.findViewById<ImageView>(R.id.logoImage)
-        private val stockTicker = view.findViewById<TextView>(R.id.stockTickerText)
-        private val stockCompanyName = view.findViewById<TextView>(R.id.stockCompanyNameText)
-        private val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
-        private val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
+        val stockLogo = view.findViewById<ImageView>(R.id.logoImage)
+        val stockTicker = view.findViewById<TextView>(R.id.stockTickerText)
+        val stockCompanyName = view.findViewById<TextView>(R.id.stockCompanyNameText)
+        val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
+        val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
 
         //all binds
         fun bindStock(stockItem: StocksEntity){

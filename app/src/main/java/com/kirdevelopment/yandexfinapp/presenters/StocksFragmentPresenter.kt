@@ -5,19 +5,15 @@ import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.kirdevelopment.yandexfinapp.adapters.FavouriteAdapter
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
-import com.kirdevelopment.yandexfinapp.views.StocksView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moxy.InjectViewState
-import moxy.MvpPresenter
 import retrofit2.awaitResponse
 import java.lang.Exception
 import java.math.RoundingMode
@@ -113,7 +109,6 @@ class StocksFragmentPresenter{
                     if(listStocks.size != stocksItemsList.size) {
                         saveToDb(stocksName, i, stocksLogo, stocksCurrentPrice1, stocksPreviousPrice1, isFavourite)
                     }
-
                 }
 
                 //add adapter and adding item in adapter
@@ -157,4 +152,12 @@ class StocksFragmentPresenter{
         database.stocksDao().insertStocks(stock)
 
     }
+
+    fun addToFavourite(context: Context){
+        GlobalScope.launch(Dispatchers.IO) { val stock = StocksEntity()
+            stock.isFavourite = true
+            val updateDatabase = StocksDatabase.getDatabase(context).stocksDao().updateStocks(stock)
+        }
+    }
+
 }
