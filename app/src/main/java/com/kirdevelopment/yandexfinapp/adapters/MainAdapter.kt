@@ -34,6 +34,8 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
         val favouriteBtn = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
 
+        var isFavourite = true
+
         favouriteBtn.setOnClickListener {
             stocksFragmentPresenter.addToFavourite(
                     holder.itemView.context,
@@ -42,7 +44,8 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
                     stockItems[position].logo,
                     holder.stockPrice.text.toString(),
                     holder.stockPriceChange.text.toString(),
-                    true)
+                    isFavourite,
+                    favouriteBtn)
         }
 
         //change background color for items

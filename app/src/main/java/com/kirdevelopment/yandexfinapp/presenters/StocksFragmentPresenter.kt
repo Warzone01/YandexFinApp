@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.adapters.FavouriteAdapter
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
@@ -179,7 +180,8 @@ class StocksFragmentPresenter{
                        logo: String,
                        currentPrice: String,
                        previousPrice: String,
-                       isFavourite: Boolean){
+                       isFavourite: Boolean,
+                       star: ImageView){
         GlobalScope.launch(Dispatchers.IO) {
             favouriteDatabase = StocksDatabase.getDatabase(context)
             val stock = StocksEntity()
@@ -191,15 +193,22 @@ class StocksFragmentPresenter{
             stock.isFavourite = isFavourite
 
             favouriteDatabase.stocksDao().updateStocks(stock)
+
+            if (isFavourite){
+                starActive(star)
+            } else{
+                starNotActive(star)
+            }
+
         }
     }
 
     fun starActive(star: ImageView){
-
+        star.setImageResource(R.drawable.ic_star_active)
     }
 
     fun starNotActive(star: ImageView){
-
+        star.setImageResource(R.drawable.ic_star)
     }
 }
 
