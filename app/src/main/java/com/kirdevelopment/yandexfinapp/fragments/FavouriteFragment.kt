@@ -19,7 +19,7 @@ class FavouriteFragment : Fragment() {
     private lateinit var favouriteRV: RecyclerView
     private lateinit var textEmpty: TextView
 
-    lateinit var favouriteFragmentPresenter: FavouriteFragmentPresenter
+    lateinit var favouriteFragmentPresenter: StocksFragmentPresenter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,14 +28,14 @@ class FavouriteFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_favourite, container, false)
 
-        favouriteFragmentPresenter = FavouriteFragmentPresenter()
+        favouriteFragmentPresenter = StocksFragmentPresenter()
 
         favouriteRV = view.findViewById(R.id.favouritesRV)
         favouriteRV.layoutManager = LinearLayoutManager(view.context)
 
         textEmpty = view.findViewById(R.id.textEmpty)
 
-        favouriteFragmentPresenter.getCurrentData(view.context, favouriteRV, textEmpty)
+        favouriteFragmentPresenter.getAllFavourites(favouriteRV, view.context)
 
         return view
     }

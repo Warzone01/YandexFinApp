@@ -7,14 +7,13 @@ import java.io.Serializable
 
 @Entity(tableName = "stocks")
 data class StocksEntity(
-        @PrimaryKey(autoGenerate = true) var id: Int? = null,
-        @ColumnInfo(name = "ticker")var ticker: String,
+        @PrimaryKey var ticker: String,
         @ColumnInfo(name = "name")var name: String,
         @ColumnInfo(name = "logo")var logo: String,
         @ColumnInfo(name = "current_price")var currentPrice: String,
         @ColumnInfo(name = "previous_price")var previousPrice: String,
         @ColumnInfo(name = "is_favourite")var isFavourite: Boolean ): Serializable{
-constructor():this(null,
+constructor():this(
         "",
         "",
         "",

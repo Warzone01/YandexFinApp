@@ -12,6 +12,7 @@ import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.stock_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,7 +35,14 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         val favouriteBtn = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
 
         favouriteBtn.setOnClickListener {
-            stocksFragmentPresenter.addToFavourite(holder.itemView.context)
+            stocksFragmentPresenter.addToFavourite(
+                    holder.itemView.context,
+                    holder.stockCompanyName.text.toString(),
+                    holder.stockTicker.text.toString(),
+                    stockItems[position].logo,
+                    holder.stockPrice.text.toString(),
+                    holder.stockPriceChange.text.toString(),
+                    true)
         }
 
         //change background color for items
@@ -61,7 +69,7 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         fun bindStock(stockItem: StocksEntity){
             stockTicker.text = stockItem.ticker
             stockCompanyName.text = stockItem.name
-            stockPrice.text = "$${stockItem.currentPrice}"
+            stockPrice.text = stockItem.currentPrice
             stockPriceChange.text = stockItem.previousPrice
 
             try {

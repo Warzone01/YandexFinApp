@@ -3,8 +3,10 @@ package com.kirdevelopment.yandexfinapp.presenters
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.kirdevelopment.yandexfinapp.adapters.FavouriteAdapter
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
@@ -27,6 +29,9 @@ class StocksFragmentPresenter{
 
     private var TAG = "StocksFragment"
     private lateinit var database: StocksDatabase
+    private lateinit var favouriteDatabase: StocksDatabase
+    private lateinit var favouriteAdapter: MainAdapter
+    private lateinit var stocksAdapter: MainAdapter
 
     private var isFavourite = false
 
@@ -39,6 +44,7 @@ class StocksFragmentPresenter{
             "KO","MCD","MSFT","CVX","GS","V","MRK","DIS","TRV","HD")
 
     private var stocksList: ArrayList<StocksEntity> = ArrayList()
+    private var favouriteList: ArrayList<StocksEntity> = ArrayList()
 
     var stocksCurrentPrice1: String = ""
     var stocksPreviousPrice1: String = ""
@@ -75,7 +81,7 @@ class StocksFragmentPresenter{
                             val minusPrice = pricePreviousItem - priceCurrentItem
                             val resOfPrices = if (priceCurrentItem > pricePreviousItem) "+$${df.format(plusPrice)}" else "-$${df.format(minusPrice)}"
 
-                            stocksCurrentPrice1 = df.format(priceCurrentItem).toString()
+                            stocksCurrentPrice1 = "$${df.format(priceCurrentItem)}"
                             stocksPreviousPrice1 = resOfPrices
 
 
@@ -116,7 +122,9 @@ class StocksFragmentPresenter{
                     //hide load progress and show stocks list
                     hideLoad(stocksRV, cv)
                     stocksList.addAll(listStocks)
-                    stocksRV.adapter = MainAdapter(stocksList)
+                    stocksAdapter = MainAdapter(stocksList)
+                    stocksRV.adapter = stocksAdapter
+                    stocksAdapter.notifyDataSetChanged()
                 }
             }catch (e: Exception){
                 println(e.toString())
@@ -153,11 +161,45 @@ class StocksFragmentPresenter{
 
     }
 
-    fun addToFavourite(context: Context){
-        GlobalScope.launch(Dispatchers.IO) { val stock = StocksEntity()
-            stock.isFavourite = true
-            val updateDatabase = StocksDatabase.getDatabase(context).stocksDao().updateStocks(stock)
+    fun getAllFavourites(favouriteRV: RecyclerView, context: Context){
+        GlobalScope.launch(Dispatchers.IO) {
+            favouriteDatabase = StocksDatabase.getDatabase(context)
+            val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
+            withContext(Dispatchers.Main){
+                favouriteList.addAll(listFavourites)
+                favouriteAdapter = MainAdapter(favouriteList)
+                favouriteRV.adapter = favouriteAdapter
+            }
         }
     }
 
+    fun addToFavourite(context: Context,
+                       name: String,
+                       ticker:String,
+                       logo: String,
+                       currentPrice: String,
+                       previousPrice: String,
+                       isFavourite: Boolean){
+        GlobalScope.launch(Dispatchers.IO) {
+            favouriteDatabase = StocksDatabase.getDatabase(context)
+            val stock = StocksEntity()
+            stock.name = name
+            stock.ticker = ticker
+            stock.currentPrice = currentPrice
+            stock.previousPrice = previousPrice
+            stock.logo = logo
+            stock.isFavourite = isFavourite
+
+            favouriteDatabase.stocksDao().updateStocks(stock)
+        }
+    }
+
+    fun starActive(star: ImageView){
+
+    }
+
+    fun starNotActive(star: ImageView){
+
+    }
 }
+
