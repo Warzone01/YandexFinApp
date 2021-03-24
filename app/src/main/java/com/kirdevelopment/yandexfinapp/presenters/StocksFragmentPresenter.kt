@@ -34,7 +34,6 @@ class StocksFragmentPresenter{
     private lateinit var favouriteAdapter: MainAdapter
     private lateinit var stocksAdapter: MainAdapter
 
-    private var isFavourite = false
 
     //creating retrofit
     private val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
@@ -114,7 +113,7 @@ class StocksFragmentPresenter{
                     Log.d(TAG, stocksLogo)
                     Log.d(TAG, stocksCurrentPrice1)
                     if(listStocks.size != stocksItemsList.size) {
-                        saveToDb(stocksName, i, stocksLogo, stocksCurrentPrice1, stocksPreviousPrice1, isFavourite)
+                        saveToDb(stocksName, i, stocksLogo, stocksCurrentPrice1, stocksPreviousPrice1)
                     }
                 }
 
@@ -147,8 +146,7 @@ class StocksFragmentPresenter{
                          ticker:String,
                          logo: String,
                          currentPrice: String,
-                         previousPrice: String,
-                         isFavourite: Boolean){
+                         previousPrice: String){
 
         val stock = StocksEntity()
         stock.name = name
@@ -156,7 +154,6 @@ class StocksFragmentPresenter{
         stock.currentPrice = currentPrice
         stock.previousPrice = previousPrice
         stock.logo = logo
-        stock.isFavourite = isFavourite
 
         database.stocksDao().insertStocks(stock)
 
@@ -180,8 +177,34 @@ class StocksFragmentPresenter{
                        logo: String,
                        currentPrice: String,
                        previousPrice: String,
-                       isFavourite: Boolean,
-                       star: ImageView){
+                       isFavourite: Boolean){
+
+        GlobalScope.launch(Dispatchers.IO) {
+            favouriteDatabase = StocksDatabase.getDatabase(context)
+            val stock = StocksEntity()
+            stock.name = name
+            stock.ticker = ticker
+            stock.currentPrice = currentPrice
+            stock.previousPrice = previousPrice
+            stock.logo = logo
+            stock.isFavourite = isFavourite
+            val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
+            favouriteDatabase.stocksDao().updateStocks(stock)
+            withContext(Dispatchers.Main){
+
+
+            }
+        }
+    }
+
+    fun delFromFavourite(context: Context,
+                         name: String,
+                         ticker:String,
+                         logo: String,
+                         currentPrice: String,
+                         previousPrice: String,
+                         isFavourite: Boolean, ){
+
         GlobalScope.launch(Dispatchers.IO) {
             favouriteDatabase = StocksDatabase.getDatabase(context)
             val stock = StocksEntity()
@@ -193,22 +216,8 @@ class StocksFragmentPresenter{
             stock.isFavourite = isFavourite
 
             favouriteDatabase.stocksDao().updateStocks(stock)
-
-            if (isFavourite){
-                starActive(star)
-            } else{
-                starNotActive(star)
-            }
-
         }
-    }
 
-    fun starActive(star: ImageView){
-        star.setImageResource(R.drawable.ic_star_active)
-    }
-
-    fun starNotActive(star: ImageView){
-        star.setImageResource(R.drawable.ic_star)
     }
 }
 

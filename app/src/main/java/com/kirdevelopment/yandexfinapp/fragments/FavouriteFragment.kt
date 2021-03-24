@@ -1,5 +1,6 @@
 package com.kirdevelopment.yandexfinapp.fragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.presenters.FavouriteFragmentPresenter
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
+import com.kirdevelopment.yandexfinapp.room.StocksDatabase
+import com.kirdevelopment.yandexfinapp.room.StocksEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moxy.MvpFragment
 
 class FavouriteFragment : Fragment() {
@@ -39,6 +46,7 @@ class FavouriteFragment : Fragment() {
 
         return view
     }
+
 
     companion object {
         @JvmStatic

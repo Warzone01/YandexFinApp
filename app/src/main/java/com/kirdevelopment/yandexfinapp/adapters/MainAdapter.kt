@@ -7,8 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
+import com.kirdevelopment.yandexfinapp.fragments.FavouriteFragment
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.squareup.picasso.Picasso
@@ -22,7 +24,7 @@ import java.lang.Exception
 class MainAdapter(private val stockItems: List<StocksEntity>):
         RecyclerView.Adapter<MainAdapter.StocksViewHolder>() {
 
-    private val stocksFragmentPresenter = StocksFragmentPresenter()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
         return StocksViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.stock_item, parent, false))
@@ -34,19 +36,32 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
         val favouriteBtn = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
 
-        var isFavourite = true
-
-        favouriteBtn.setOnClickListener {
-            stocksFragmentPresenter.addToFavourite(
-                    holder.itemView.context,
-                    holder.stockCompanyName.text.toString(),
-                    holder.stockTicker.text.toString(),
-                    stockItems[position].logo,
-                    holder.stockPrice.text.toString(),
-                    holder.stockPriceChange.text.toString(),
-                    isFavourite,
-                    favouriteBtn)
-        }
+//        favouriteBtn.setOnClickListener {
+//            if (!isFavourite) {
+//                isFavourite = true
+//                stocksFragmentPresenter.addToFavourite(
+//                        holder.itemView.context,
+//                        holder.stockCompanyName.text.toString(),
+//                        holder.stockTicker.text.toString(),
+//                        stockItems[position].logo,
+//                        holder.stockPrice.text.toString(),
+//                        holder.stockPriceChange.text.toString(),
+//                        isFavourite,
+//                        favouriteBtn)
+//            }else{
+//                isFavourite = false
+//                stocksFragmentPresenter.delFromFavourite(
+//                        holder.itemView.context,
+//                        holder.stockCompanyName.text.toString(),
+//                        holder.stockTicker.text.toString(),
+//                        stockItems[position].logo,
+//                        holder.stockPrice.text.toString(),
+//                        holder.stockPriceChange.text.toString(),
+//                        isFavourite,
+//                        favouriteBtn
+//                )
+//            }
+//        }
 
         //change background color for items
         if (position % 2 == 1){
@@ -67,13 +82,43 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         val stockCompanyName = view.findViewById<TextView>(R.id.stockCompanyNameText)
         val stockPrice = view.findViewById<TextView>(R.id.stockPriceText)
         val stockPriceChange = view.findViewById<TextView>(R.id.stockPriceChangeText)
+        val stockIsFavourite = view.findViewById<ImageView>(R.id.addToFavouriteButton)
 
         //all binds
         fun bindStock(stockItem: StocksEntity){
+            val stocksFragmentPresenter = StocksFragmentPresenter()
             stockTicker.text = stockItem.ticker
             stockCompanyName.text = stockItem.name
             stockPrice.text = stockItem.currentPrice
             stockPriceChange.text = stockItem.previousPrice
+
+
+            if (stockItem.isFavourite){
+                stockIsFavourite.setImageResource(R.drawable.ic_star_active)
+            } else{
+                stockIsFavourite.setImageResource(R.drawable.ic_star)
+            }
+
+            stockIsFavourite.setOnClickListener {
+                if (!stockItem.isFavourite){
+                    stocksFragmentPresenter.addToFavourite(itemView.context,
+                            stockItem.name,
+                            stockItem.ticker,
+                            stockItem.logo,
+                            stockItem.currentPrice,
+                            stockItem.previousPrice,
+                            true)
+                }else{
+                    stocksFragmentPresenter.delFromFavourite(itemView.context,
+                            stockItem.name,
+                            stockItem.ticker,
+                            stockItem.logo,
+                            stockItem.currentPrice,
+                            stockItem.previousPrice,
+                            false)
+                }
+            }
+
 
             try {
                 Picasso.get()
@@ -88,6 +133,7 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
             }else{
                 stockPriceChange.setTextColor("#24B25D".toColorInt())
             }
+
 
         }
     }
