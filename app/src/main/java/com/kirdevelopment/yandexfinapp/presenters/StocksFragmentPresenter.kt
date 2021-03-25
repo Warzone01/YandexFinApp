@@ -4,15 +4,15 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.kirdevelopment.yandexfinapp.R
-import com.kirdevelopment.yandexfinapp.adapters.FavouriteAdapter
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
+import com.kirdevelopment.yandexfinapp.views.StocksView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -159,14 +159,22 @@ class StocksFragmentPresenter{
 
     }
 
-    fun getAllFavourites(favouriteRV: RecyclerView, context: Context){
+    fun getAllFavourites(favouriteRV: RecyclerView, context: Context, textEmpty: TextView){
         GlobalScope.launch(Dispatchers.IO) {
-            favouriteDatabase = StocksDatabase.getDatabase(context)
             val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
             withContext(Dispatchers.Main){
+                favouriteList.clear()
                 favouriteList.addAll(listFavourites)
                 favouriteAdapter = MainAdapter(favouriteList)
                 favouriteRV.adapter = favouriteAdapter
+                if (favouriteList.isEmpty()){
+                    textEmpty.visibility = View.VISIBLE
+                    favouriteRV.visibility = View.GONE
+                } else {
+                    favouriteRV.visibility = View.VISIBLE
+                    textEmpty.visibility = View.GONE
+                }
+
             }
         }
     }
@@ -190,9 +198,10 @@ class StocksFragmentPresenter{
             stock.isFavourite = isFavourite
             val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
             favouriteDatabase.stocksDao().updateStocks(stock)
-            withContext(Dispatchers.Main){
-
-
+            withContext(Dispatchers.Main) {
+                favouriteList.clear()
+                favouriteList.addAll(listFavourites)
+                favouriteAdapter = MainAdapter(favouriteList)
             }
         }
     }
@@ -203,7 +212,7 @@ class StocksFragmentPresenter{
                          logo: String,
                          currentPrice: String,
                          previousPrice: String,
-                         isFavourite: Boolean, ){
+                         isFavourite: Boolean){
 
         GlobalScope.launch(Dispatchers.IO) {
             favouriteDatabase = StocksDatabase.getDatabase(context)
@@ -214,10 +223,14 @@ class StocksFragmentPresenter{
             stock.previousPrice = previousPrice
             stock.logo = logo
             stock.isFavourite = isFavourite
-
+            val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
             favouriteDatabase.stocksDao().updateStocks(stock)
+            withContext(Dispatchers.Main) {
+                favouriteList.clear()
+                favouriteList.addAll(listFavourites)
+                favouriteAdapter = MainAdapter(favouriteList)
+            }
         }
-
     }
 }
 

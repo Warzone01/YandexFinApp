@@ -1,30 +1,30 @@
 package com.kirdevelopment.yandexfinapp.fragments
 
 import android.content.Context
+import android.media.Image
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
-import com.kirdevelopment.yandexfinapp.presenters.FavouriteFragmentPresenter
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import moxy.MvpFragment
 
 class FavouriteFragment : Fragment() {
 
     private lateinit var favouriteRV: RecyclerView
     private lateinit var textEmpty: TextView
+    private lateinit var favouriteButton: ImageView
+    private lateinit var favouriteDatabase: StocksDatabase
 
     lateinit var favouriteFragmentPresenter: StocksFragmentPresenter
 
@@ -42,11 +42,10 @@ class FavouriteFragment : Fragment() {
 
         textEmpty = view.findViewById(R.id.textEmpty)
 
-        favouriteFragmentPresenter.getAllFavourites(favouriteRV, view.context)
+        favouriteFragmentPresenter.getAllFavourites(favouriteRV, view.context, textEmpty)
 
         return view
     }
-
 
     companion object {
         @JvmStatic

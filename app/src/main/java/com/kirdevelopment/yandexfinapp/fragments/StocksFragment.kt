@@ -1,5 +1,6 @@
 package com.kirdevelopment.yandexfinapp.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.util.Log.d
@@ -15,6 +16,8 @@ import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
+import com.kirdevelopment.yandexfinapp.room.StocksDatabase
+import com.kirdevelopment.yandexfinapp.room.StocksEntity
 import com.kirdevelopment.yandexfinapp.views.StocksView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,6 +55,8 @@ class StocksFragment : Fragment() {
 
         return view
     }
+
+
 
     companion object {
         @JvmStatic

@@ -34,34 +34,30 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
         holder.bindStock(stockItems[position])
 
         val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.stockItemLayout)
-        val favouriteBtn = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
+        val stockIsFavourite = holder.itemView.findViewById<ImageView>(R.id.addToFavouriteButton)
 
-//        favouriteBtn.setOnClickListener {
-//            if (!isFavourite) {
-//                isFavourite = true
-//                stocksFragmentPresenter.addToFavourite(
-//                        holder.itemView.context,
-//                        holder.stockCompanyName.text.toString(),
-//                        holder.stockTicker.text.toString(),
-//                        stockItems[position].logo,
-//                        holder.stockPrice.text.toString(),
-//                        holder.stockPriceChange.text.toString(),
-//                        isFavourite,
-//                        favouriteBtn)
-//            }else{
-//                isFavourite = false
-//                stocksFragmentPresenter.delFromFavourite(
-//                        holder.itemView.context,
-//                        holder.stockCompanyName.text.toString(),
-//                        holder.stockTicker.text.toString(),
-//                        stockItems[position].logo,
-//                        holder.stockPrice.text.toString(),
-//                        holder.stockPriceChange.text.toString(),
-//                        isFavourite,
-//                        favouriteBtn
-//                )
-//            }
-//        }
+        val stocksFragmentPresenter = StocksFragmentPresenter()
+
+        stockIsFavourite.setOnClickListener {
+            if (!stockItems[position].isFavourite){
+                stocksFragmentPresenter.addToFavourite(holder.itemView.context,
+                        stockItems[position].name,
+                        stockItems[position].ticker,
+                        stockItems[position].logo,
+                        stockItems[position].currentPrice,
+                        stockItems[position].previousPrice,
+                        true)
+            }else{
+                stocksFragmentPresenter.delFromFavourite(holder.itemView.context,
+                        stockItems[position].name,
+                        stockItems[position].ticker,
+                        stockItems[position].logo,
+                        stockItems[position].currentPrice,
+                        stockItems[position].previousPrice,
+                        false)
+            }
+            notifyDataSetChanged()
+        }
 
         //change background color for items
         if (position % 2 == 1){
@@ -98,27 +94,6 @@ class MainAdapter(private val stockItems: List<StocksEntity>):
             } else{
                 stockIsFavourite.setImageResource(R.drawable.ic_star)
             }
-
-            stockIsFavourite.setOnClickListener {
-                if (!stockItem.isFavourite){
-                    stocksFragmentPresenter.addToFavourite(itemView.context,
-                            stockItem.name,
-                            stockItem.ticker,
-                            stockItem.logo,
-                            stockItem.currentPrice,
-                            stockItem.previousPrice,
-                            true)
-                }else{
-                    stocksFragmentPresenter.delFromFavourite(itemView.context,
-                            stockItem.name,
-                            stockItem.ticker,
-                            stockItem.logo,
-                            stockItem.currentPrice,
-                            stockItem.previousPrice,
-                            false)
-                }
-            }
-
 
             try {
                 Picasso.get()
