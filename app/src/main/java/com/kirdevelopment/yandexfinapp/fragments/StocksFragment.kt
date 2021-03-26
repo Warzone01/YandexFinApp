@@ -15,6 +15,7 @@ import com.kirdevelopment.yandexfinapp.R
 import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
 import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
 import com.kirdevelopment.yandexfinapp.api.StockApi
+import com.kirdevelopment.yandexfinapp.listeners.StarClickListener
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
@@ -31,7 +32,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.*
 
-class StocksFragment : Fragment() {
+class StocksFragment : Fragment(), StarClickListener {
 
     private lateinit var stocksRV: RecyclerView
     private lateinit var stocksProgress: CircularProgressIndicator
@@ -51,7 +52,7 @@ class StocksFragment : Fragment() {
 
         stocksRV.layoutManager = LinearLayoutManager(view.context)
 
-        stocksPresenter.getCurrentData(stocksRV, stocksProgress, view.context)
+        stocksPresenter.getCurrentData(stocksRV, stocksProgress, view.context, this)
 
         return view
     }
@@ -63,5 +64,14 @@ class StocksFragment : Fragment() {
         fun newInstance() = StocksFragment()
     }
 
+    override fun onStarClicked(stock: StocksEntity, position: Int, context: Context) {
 
+        if (!stock.isFavourite){
+            stocksPresenter.addStockToFavourite(stock, position, context, this)
+        } else{
+            println("Click2")
+            stocksPresenter.deleteStockFromFavourite(stock, position, context, this)
+        }
+
+    }
 }

@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kirdevelopment.yandexfinapp.R
+import com.kirdevelopment.yandexfinapp.listeners.StarClickListener
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
@@ -19,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class FavouriteFragment : Fragment() {
+class FavouriteFragment : Fragment(), StarClickListener {
 
     private lateinit var favouriteRV: RecyclerView
     private lateinit var textEmpty: TextView
@@ -42,7 +43,7 @@ class FavouriteFragment : Fragment() {
 
         textEmpty = view.findViewById(R.id.textEmpty)
 
-        favouriteFragmentPresenter.getAllFavourites(favouriteRV, view.context, textEmpty)
+        favouriteFragmentPresenter.getAllFavourites(favouriteRV, view.context, textEmpty, this)
 
         return view
     }
@@ -50,5 +51,15 @@ class FavouriteFragment : Fragment() {
     companion object {
         @JvmStatic
         fun newInstance() = FavouriteFragment()
+    }
+
+    override fun onStarClicked(stock: StocksEntity, position: Int, context: Context) {
+        println("CLICK1")
+        if (!stock.isFavourite){
+            favouriteFragmentPresenter.addStockToFavourite(stock, position, context, this)
+        } else{
+            println("Click2")
+            favouriteFragmentPresenter.deleteStockFromFavourite(stock, position, context, this)
+        }
     }
 }
