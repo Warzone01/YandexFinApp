@@ -3,7 +3,6 @@ package com.kirdevelopment.yandexfinapp.presenters
 import android.content.Context
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -13,7 +12,6 @@ import com.kirdevelopment.yandexfinapp.api.StockApi
 import com.kirdevelopment.yandexfinapp.listeners.StarClickListener
 import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
-import com.kirdevelopment.yandexfinapp.views.StocksView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -25,7 +23,7 @@ import java.text.DecimalFormat
 
 
 private const val BASE_URL = "https://finnhub.io/api/v1/"
-private const val TOKEN = "c0nk5uv48v6temfsrpdg"
+private const val TOKEN = ""
 
 class StocksFragmentPresenter{
 
@@ -35,12 +33,6 @@ class StocksFragmentPresenter{
     private lateinit var favouriteAdapter: MainAdapter
     private lateinit var stocksAdapter: MainAdapter
 
-    private val requestCodeAddToFavourite = 1
-    private val requestCodeDeleteFromFavourite = 2
-
-    private var requestCode = 0
-
-    private var stockClickedPosition = -1
 
     //creating retrofit
     private val service = RetrofitInstance.getStocks(BASE_URL).create(StockApi::class.java)
@@ -58,14 +50,13 @@ class StocksFragmentPresenter{
     var stocksName: String = ""
     var stocksLogo: String = ""
 
+    //function to get all stocks from database
     fun getCurrentData(stocksRV: RecyclerView, cv: CircularProgressIndicator, context: Context, clickListener: StarClickListener){
 //        //sorting stocks for alphabet
 //        stocksItemsList.sort()
         //show load progress and hide stocks list
         showLoad(stocksRV, cv)
-
         database = StocksDatabase.getDatabase(context)
-
         //starting coroutine for add items from api
         GlobalScope.launch(Dispatchers.IO) {
             try {
@@ -149,6 +140,7 @@ class StocksFragmentPresenter{
         cv.visibility = View.GONE
     }
 
+    //function to save stocks to database
     private fun saveToDb(name: String,
                          ticker:String,
                          logo: String,
@@ -165,9 +157,7 @@ class StocksFragmentPresenter{
         database.stocksDao().insertStocks(stock)
 
     }
-
-
-
+    //function to get all favourites from database
     fun getAllFavourites(favouriteRV: RecyclerView, context: Context, textEmpty: TextView, clickListener: StarClickListener){
         GlobalScope.launch(Dispatchers.IO) {
             val listFavourites = StocksDatabase.getDatabase(context).stocksDao().getAllFavourites()
@@ -175,6 +165,8 @@ class StocksFragmentPresenter{
                 favouriteList.addAll(listFavourites)
                 favouriteAdapter = MainAdapter(favouriteList, clickListener)
                 favouriteRV.adapter = favouriteAdapter
+
+                //show empty attention if list Favourites empty
                 if (favouriteList.isEmpty()){
                     textEmpty.visibility = View.VISIBLE
                     favouriteRV.visibility = View.GONE
@@ -185,8 +177,7 @@ class StocksFragmentPresenter{
             }
         }
     }
-
-
+    //function to add favourites to database and layout
     fun addStockToFavourite(stock: StocksEntity, position:Int, context: Context, clickListener: StarClickListener){
         GlobalScope.launch(Dispatchers.IO) {
             favouriteDatabase = StocksDatabase.getDatabase(context)
@@ -201,15 +192,18 @@ class StocksFragmentPresenter{
                 favouriteList.clear()
                 favouriteList.addAll(listFavourites)
                 for (i in favouriteList){
-                    println("AFter $i")
+                    println("After $i")
                 }
+
+                //updating adapter
                 favouriteAdapter = MainAdapter(favouriteList, clickListener)
                 favouriteAdapter.notifyItemRangeRemoved(0, favouriteList.size)
                 favouriteAdapter.notifyItemRangeInserted(0, favouriteList.size)
             }
         }
-
     }
+
+    //function to delete favourite from database and layout
     fun deleteStockFromFavourite(stock: StocksEntity, position:Int, context: Context, clickListener: StarClickListener){
         GlobalScope.launch(Dispatchers.IO) {
             favouriteDatabase = StocksDatabase.getDatabase(context)
@@ -217,6 +211,8 @@ class StocksFragmentPresenter{
             favouriteDatabase.stocksDao().updateStocks(stock)
             withContext(Dispatchers.Main){
                 println("Click2")
+
+                //updating adapter
                 favouriteList.removeAt(position)
                 favouriteAdapter = MainAdapter(favouriteList, clickListener)
                 favouriteAdapter.notifyItemRemoved(position)

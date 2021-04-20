@@ -2,8 +2,6 @@ package com.kirdevelopment.yandexfinapp.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.util.Log.d
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,25 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.kirdevelopment.yandexfinapp.R
-import com.kirdevelopment.yandexfinapp.adapters.MainAdapter
-import com.kirdevelopment.yandexfinapp.api.RetrofitInstance
-import com.kirdevelopment.yandexfinapp.api.StockApi
 import com.kirdevelopment.yandexfinapp.listeners.StarClickListener
 import com.kirdevelopment.yandexfinapp.presenters.StocksFragmentPresenter
-import com.kirdevelopment.yandexfinapp.room.StocksDatabase
 import com.kirdevelopment.yandexfinapp.room.StocksEntity
-import com.kirdevelopment.yandexfinapp.views.StocksView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import moxy.MvpFragment
-import moxy.presenter.InjectPresenter
-import retrofit2.*
-import java.lang.Exception
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.util.*
 
 class StocksFragment : Fragment(), StarClickListener {
 
